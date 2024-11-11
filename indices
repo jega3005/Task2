@@ -1,0 +1,85 @@
+// // Used a sliding window technique with frequency counts // //
+using System;
+using System.Collections.Generic;
+
+public class Solution
+{
+    public IList<int> FindAnagrams(string s, string p)
+    {
+        var result = new List<int>();
+        int lenP = p.Length;
+        int lenS = s.Length;
+        
+        if (lenS < lenP) return result;
+
+        // Creating frequency counts for p and the first window in s
+        int[] pCount = new int[26];
+        int[] windowCount = new int[26];
+        
+        foreach (char c in p)
+        {
+            pCount[c - 'a']++;
+        }
+        
+        for (int i = 0; i < lenP - 1; i++)
+        {
+            windowCount[s[i] - 'a']++;
+        }
+        
+        for (int i = lenP - 1; i < lenS; i++)
+        {
+            // Adding the new character to the current window count
+            windowCount[s[i] - 'a']++;
+            
+            // Checking if windowCount matches pCount
+            if (IsMatch(pCount, windowCount))
+            {
+                result.Add(i - lenP + 1);
+            }
+            
+    // Removing the character that's sliding out of the window
+            windowCount[s[i - lenP + 1] - 'a']--;
+        }
+
+        return result;
+    }
+
+    // using Helper function to compare two frequency arrays
+    private bool IsMatch(int[] pCount, int[] windowCount)
+    {
+        for (int i = 0; i < 26; i++)
+        {
+            if (pCount[i] != windowCount[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var solution = new Solution();
+        
+        string s1 = "cbaebabacd";
+        string p1 = "abc";
+        Console.WriteLine("Output: [" + string.Join(", ", solution.FindAnagrams(s1, p1)) + "]");  // Output: [0, 6]
+        
+        string s2 = "abab";
+        string p2 = "ab";
+        Console.WriteLine("Output: [" + string.Join(", ", solution.FindAnagrams(s2, p2)) + "]"); // Output: [0, 1, 2]
+    }}
+
+// Explanation of the above solution // 
+Frequency Arrays: Used two arrays pCount and windowCount to store the character frequencies for p and the current window in s, respectively. Since the input only contains lowercase English letters, each array has 26 elements (one for each letter).
+Initialized Frequency Arrays: Populate pCount with the frequencies of each character in p. Then initialize the first window of s with size lenP - 1 in windowCount.
+Sliding Window:
+For each character in s starting from lenP - 1:
+windowCount updated by including the current character.
+windowCount checked if matches pCount using the helper method IsMatch. If they match, add the starting index of this window to result.
+Slide the window by removing the character that is going out of the window from windowCount.
+Helper Method IsMatch: It compares pCount and windowCount by checking if all corresponding elements are equal.
+//Final Output: The result list contains the starting indices of the anagrams of p in s.
